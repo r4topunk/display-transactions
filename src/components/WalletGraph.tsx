@@ -7,7 +7,6 @@ interface Node {
   address: string;
   isCentral: boolean;
   interactions: number;
-  // Add position properties that ForceGraph automatically adds
   x?: number;
   y?: number;
   vx?: number;
@@ -31,6 +30,9 @@ interface WalletGraphProps {
   data: GraphData | null;
   centralAddress: string;
 }
+
+// Default empty graph data
+const EMPTY_GRAPH_DATA: GraphData = { nodes: [], links: [] };
 
 export function WalletGraph({ data, centralAddress }: WalletGraphProps) {
   const addLog = useLoggerStore((state) => state.addLog);
@@ -125,25 +127,14 @@ export function WalletGraph({ data, centralAddress }: WalletGraphProps) {
     [data]
   );
 
-  if (!data) {
-    return (
-      <div className="w-full h-[600px] flex items-center justify-center border rounded-lg bg-slate-50">
-        <p className="text-slate-500">
-          Enter a wallet address to visualize interactions
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div
-      className="w-full border rounded-lg overflow-hidden"
+      className="w-full border rounded-lg overflow-hidden relative"
       ref={containerRef}
     >
       <ForceGraph2D
-        // Fix the casting to use the proper generic types
         ref={graphRef as React.MutableRefObject<ForceGraphMethods<Node, Link>>}
-        graphData={data}
+        graphData={data || EMPTY_GRAPH_DATA}
         width={dimensions.width}
         height={dimensions.height}
         nodeCanvasObject={nodeCanvasObject}
@@ -158,8 +149,17 @@ export function WalletGraph({ data, centralAddress }: WalletGraphProps) {
           }`
         }
         cooldownTicks={100}
-        onEngineStop={() => addLog("Graph rendering completed")}
+        onEngineStop={() => data && addLog("Graph rendering completed")}
       />
+
+      {/* Overlay message when no data */}
+      {!data && (
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-50 bg-opacity-80">
+          <p className="text-slate-500">
+            Enter a wallet address to visualize interactions
+          </p>
+        </div>
+      )}
     </div>
   );
 }
