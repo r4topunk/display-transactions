@@ -2,6 +2,7 @@ import { useState } from "react";
 import { WalletInput } from "./components/WalletInput";
 import { TransactionLogger } from "./components/TransactionLogger";
 import { WalletGraph } from "./components/WalletGraph";
+import { TransactionList } from "./components/TransactionList";
 import {
   fetchAllTransactions,
   processTransactionsForGraph,
@@ -9,17 +10,20 @@ import {
 
 // Import GraphData interface from WalletGraph component
 import type { GraphData } from "./components/WalletGraph";
+import type { TransactionData } from "./services/basescan"; // Make sure this type exists or create it
 
 function App() {
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState<string>("");
   const [graphData, setGraphData] = useState<GraphData | null>(null);
+  const [transactions, setTransactions] = useState<TransactionData[]>([]);
 
   const handleWalletSubmit = async (walletAddress: string) => {
     setLoading(true);
     setAddress(walletAddress);
     try {
       const transactions = await fetchAllTransactions(walletAddress);
+      setTransactions(transactions);
       const graphData = processTransactionsForGraph(
         transactions,
         walletAddress
@@ -48,6 +52,7 @@ function App() {
         <WalletInput onSubmit={handleWalletSubmit} isLoading={loading} />
         <TransactionLogger />
         <WalletGraph data={graphData} centralAddress={address} />
+        <TransactionList transactions={transactions} centralAddress={address} />
       </div>
     </div>
   );
