@@ -43,8 +43,8 @@ function App() {
           Base Blockchain Wallet Interactions
         </h1>
         <p className="text-slate-500">
-          Enter a wallet address to visualize its interactions with other
-          wallets on the Base blockchain.
+          Enter a wallet address or ENS name to visualize its interactions with
+          other wallets on the Base blockchain.
         </p>
       </div>
 
