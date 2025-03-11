@@ -7,6 +7,13 @@ interface Node {
   address: string;
   isCentral: boolean;
   interactions: number;
+  // Add position properties that ForceGraph automatically adds
+  x?: number;
+  y?: number;
+  vx?: number;
+  vy?: number;
+  fx?: number;
+  fy?: number;
 }
 
 interface Link {
@@ -28,7 +35,7 @@ interface WalletGraphProps {
 export function WalletGraph({ data, centralAddress }: WalletGraphProps) {
   const addLog = useLoggerStore((state) => state.addLog);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-  const graphRef = useRef<ForceGraphMethods>();
+  const graphRef = useRef<ForceGraphMethods<Node, Link> | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,10 +48,28 @@ export function WalletGraph({ data, centralAddress }: WalletGraphProps) {
       }
     };
 
-    window.addEventListener("resize", updateDimensions);
-    updateDimensions();
+    // Call initially with a small delay to ensure DOM is rendered
+    setTimeout(updateDimensions, 5000);
 
-    return () => window.removeEventListener("resize", updateDimensions);
+    // Use ResizeObserver for more reliable size detection
+    const resizeObserver = new ResizeObserver(() => {
+      updateDimensions();
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    // Also keep window resize listener as a fallback
+    window.addEventListener("resize", updateDimensions);
+
+    return () => {
+      if (containerRef.current) {
+        resizeObserver.unobserve(containerRef.current);
+      }
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateDimensions);
+    };
   }, []);
 
   useEffect(() => {
@@ -116,7 +141,8 @@ export function WalletGraph({ data, centralAddress }: WalletGraphProps) {
       ref={containerRef}
     >
       <ForceGraph2D
-        ref={graphRef as React.MutableRefObject<ForceGraphMethods>}
+        // Fix the casting to use the proper generic types
+        ref={graphRef as React.MutableRefObject<ForceGraphMethods<Node, Link>>}
         graphData={data}
         width={dimensions.width}
         height={dimensions.height}
