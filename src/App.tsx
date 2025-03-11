@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { WalletInput } from "./components/WalletInput";
 import { TransactionLogger } from "./components/TransactionLogger";
 import { WalletGraph } from "./components/WalletGraph";
@@ -8,10 +7,13 @@ import {
   processTransactionsForGraph,
 } from "./services/basescan";
 
+// Import GraphData interface from WalletGraph component
+import type { GraphData } from "./components/WalletGraph";
+
 function App() {
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState<string>("");
-  const [graphData, setGraphData] = useState(null);
+  const [graphData, setGraphData] = useState<GraphData | null>(null);
 
   const handleWalletSubmit = async (walletAddress: string) => {
     setLoading(true);

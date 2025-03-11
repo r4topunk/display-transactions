@@ -21,7 +21,7 @@ interface Link {
   value: number;
 }
 
-interface GraphData {
+export interface GraphData {
   nodes: Node[];
   links: Link[];
 }
