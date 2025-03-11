@@ -28,7 +28,7 @@ export function WalletInput({ onSubmit, isLoading }: WalletInputProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md">
+    <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md mx-auto">
       <div className="space-y-2">
         <Label htmlFor="wallet-address">Wallet Address</Label>
         <Input
